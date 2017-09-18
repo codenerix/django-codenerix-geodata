@@ -35,7 +35,7 @@ from django.core.management.base import BaseCommand
 from django.utils.translation import ugettext as _
 from django.core.exceptions import ObjectDoesNotExist
 
-from codenerix_geodata.geodata.models import Continent, Country, Region, Province, City, TimeZone
+from codenerix_geodata.models import Continent, Country, Region, Province, City, TimeZone
 
 
 BASE_LANGUAGE = 'EN'
@@ -168,15 +168,15 @@ class Command(BaseCommand):
 
         print('Importing new data ... This action may take some minutes.')
         print('')
-        data_path = join(dirname(dirname(dirname(__file__))), 'geodata/data')
+        data_path = join(dirname(dirname(dirname(__file__))), 'data')
 
         # Importing language generated models
         for lang in LANGUAGES:
-            exec('from codenerix_geodata.geodata.models import ContinentGeoName{}'.format(lang))
-            exec('from codenerix_geodata.geodata.models import CountryGeoName{}'.format(lang))
-            exec('from codenerix_geodata.geodata.models import RegionGeoName{}'.format(lang))
-            exec('from codenerix_geodata.geodata.models import ProvinceGeoName{}'.format(lang))
-            exec('from codenerix_geodata.geodata.models import CityGeoName{}'.format(lang))
+            exec('from codenerix_geodata.models import ContinentGeoName{}'.format(lang))
+            exec('from codenerix_geodata.models import CountryGeoName{}'.format(lang))
+            exec('from codenerix_geodata.models import RegionGeoName{}'.format(lang))
+            exec('from codenerix_geodata.models import ProvinceGeoName{}'.format(lang))
+            exec('from codenerix_geodata.models import CityGeoName{}'.format(lang))
 
         print('Importing continents ... ',)
         continents = {}
