@@ -29,7 +29,7 @@ from codenerix.models import CodenerixModel
 
 class GenGeoName(CodenerixModel):  # META: Abstract class
 
-    class Meta:
+    class Meta(CodenerixModel.Meta):
         abstract = True
 
     name = models.CharField(_('Name'), max_length=100, blank=False)
