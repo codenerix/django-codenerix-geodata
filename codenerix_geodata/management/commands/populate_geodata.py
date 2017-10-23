@@ -26,8 +26,6 @@ Two different databases were used:
 """
 
 from os.path import dirname, join
-import bz2
-# from bz2 import BZ2File
 from csv import reader
 
 from django.conf import settings
@@ -35,6 +33,7 @@ from django.core.management.base import BaseCommand
 from django.utils.translation import ugettext as _
 from django.core.exceptions import ObjectDoesNotExist
 
+from codenerix_extensions.helpers import FileBZ2
 from codenerix_geodata.models import Continent, Country, Region, Province, City, TimeZone
 
 
@@ -75,8 +74,7 @@ def populate_missing_names(data):
 
 
 def continents_lines(filename):
-    # with BZ2File(filename, 'rU') as data_file:
-    with bz2.open(filename, 'rt') as data_file:
+    with FileBZ2(filename, 'rb') as data_file:
         csv_file = reader(data_file, delimiter=',', quotechar='"')
 
         first = True
@@ -91,8 +89,7 @@ def continents_lines(filename):
 
 
 def country_lines(filename):
-    # with BZ2File(filename, 'rU') as data_file:
-    with bz2.open(filename, 'rt') as data_file:
+    with FileBZ2(filename, 'rb') as data_file:
         csv_file = reader(data_file, delimiter=',', quotechar='"')
 
         first = True
@@ -107,8 +104,7 @@ def country_lines(filename):
 
 
 def region_lines(filename):
-    # with BZ2File(filename, 'rU') as data_file:
-    with bz2.open(filename, 'rt') as data_file:
+    with FileBZ2(filename, 'rb') as data_file:
         csv_file = reader(data_file, delimiter=',', quotechar='"')
 
         first = True
@@ -123,8 +119,7 @@ def region_lines(filename):
 
 
 def province_lines(filename):
-    # with BZ2File(filename, 'rU') as data_file:
-    with bz2.open(filename, 'rt') as data_file:
+    with FileBZ2(filename, 'rb') as data_file:
         csv_file = reader(data_file, delimiter=',', quotechar='"')
 
         first = True
@@ -139,8 +134,7 @@ def province_lines(filename):
 
 
 def city_lines(filename):
-    # with BZ2File(filename, 'rU') as data_file:
-    with bz2.open(filename, 'rt') as data_file:
+    with FileBZ2(filename, 'rb') as data_file:
         csv_file = reader(data_file, delimiter=',', quotechar='"')
 
         first = True
