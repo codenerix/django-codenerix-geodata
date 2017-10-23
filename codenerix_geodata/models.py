@@ -25,6 +25,7 @@ from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
 
 from codenerix.models import CodenerixModel
+from codenerix_extensions.helpers import get_language_database
 
 
 class GenGeoName(CodenerixModel):  # META: Abstract class
@@ -34,11 +35,11 @@ class GenGeoName(CodenerixModel):  # META: Abstract class
 
     name = models.CharField(_('Name'), max_length=100, blank=False)
 
-    def __unicode__(self):
+    def __str__(self):
         return u'{}'.format(smart_text(self.name))
 
-    def __str__(self):
-        return self.__unicode__()
+    def __unicode__(self):
+        return self.__str__()
 
     def __fields__(self, info):
         return [
@@ -49,11 +50,17 @@ class GenGeoName(CodenerixModel):  # META: Abstract class
 class Continent(CodenerixModel):
     code = models.CharField(_('Code'), max_length=2, unique=True, blank=False)
 
-    def __unicode__(self):
-        return u"{}".format(smart_text(self.code))
-
     def __str__(self):
-        return self.__unicode__()
+        lang = get_language_database()
+        lang_obj = getattr(self, '{}'.format(lang), None)
+        if lang_obj and lang_obj.name:
+            txt = lang_obj.name
+        else:
+            txt = self.code
+        return u"{}".format(smart_text(txt))
+
+    def __unicode__(self):
+        return self.__str__()
 
     def __fields__(self, info):
         return [
@@ -75,11 +82,17 @@ class Country(CodenerixModel):
     code = models.CharField(_('Code'), max_length=2, unique=True, blank=False)
     continent = models.ForeignKey(Continent, verbose_name=_('Continent'), related_name='countries', null=False)
 
-    def __unicode__(self):
-        return u"{}".format(smart_text(self.code))
-
     def __str__(self):
-        return self.__unicode__()
+        lang = get_language_database()
+        lang_obj = getattr(self, '{}'.format(lang), None)
+        if lang_obj and lang_obj.name:
+            txt = lang_obj.name
+        else:
+            txt = self.code
+        return u"{}".format(smart_text(txt))
+
+    def __unicode__(self):
+        return self.__str__()
 
     def __fields__(self, info):
         return [
@@ -101,11 +114,11 @@ class Country(CodenerixModel):
 class TimeZone(CodenerixModel):
     name = models.CharField(_('Name'), max_length=50, unique=True, blank=False)
 
-    def __unicode__(self):
+    def __str__(self):
         return u"{}".format(smart_text(self.name))
 
-    def __str__(self):
-        return self.__unicode__()
+    def __unicode__(self):
+        return self.__str__()
 
     def __fields__(self, info):
         return [
@@ -127,11 +140,17 @@ class Region(CodenerixModel):
     country = models.ForeignKey(Country, verbose_name=_('Country'), null=False, related_name='regions')
     code = models.CharField(_('Code'), max_length=3, blank=False)
 
-    def __unicode__(self):
-        return u"{} - {}".format(smart_text(self.country), self.code)
-
     def __str__(self):
-        return self.__unicode__()
+        lang = get_language_database()
+        lang_obj = getattr(self, '{}'.format(lang), None)
+        if lang_obj and lang_obj.name:
+            txt = lang_obj.name
+        else:
+            txt = self.code
+        return u"{}".format(smart_text(txt))
+
+    def __unicode__(self):
+        return self.__str__()
 
     def __fields__(self, info):
         return [
@@ -154,11 +173,17 @@ class Province(CodenerixModel):
     region = models.ForeignKey(Region, verbose_name=_('Region'), null=False, related_name='provinces')
     code = models.CharField(_('Code'), max_length=3, blank=False)
 
-    def __unicode__(self):
-        return u"{} - {}".format(smart_text(self.region), self.code)
-
     def __str__(self):
-        return self.__unicode__()
+        lang = get_language_database()
+        lang_obj = getattr(self, '{}'.format(lang), None)
+        if lang_obj and lang_obj.name:
+            txt = lang_obj.name
+        else:
+            txt = self.code
+        return u"{}".format(smart_text(txt))
+
+    def __unicode__(self):
+        return self.__str__()
 
     def __fields__(self, info):
         return [
@@ -183,11 +208,17 @@ class City(CodenerixModel):
     province = models.ForeignKey(Province, verbose_name=_('Province'), null=True, related_name='cities')
     time_zone = models.ForeignKey(TimeZone, verbose_name=_('City'), null=False, related_name='cities')
 
-    def __unicode__(self):
-        return u"{} - {}".format(smart_text(self.country), smart_text(self.time_zone))
-
     def __str__(self):
-        return self.__unicode__()
+        lang = get_language_database()
+        lang_obj = getattr(self, '{}'.format(lang), None)
+        if lang_obj and lang_obj.name:
+            txt = lang_obj.name
+        else:
+            txt = self.code
+        return u"{}".format(smart_text(txt))
+
+    def __unicode__(self):
+        return self.__str__()
 
     def __fields__(self, info):
         return [
