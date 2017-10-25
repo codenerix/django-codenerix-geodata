@@ -209,7 +209,7 @@ class CountryDelete(GenCountryUrl, GenDelete):
     model = Country
 
 
-class CountryForeign(GenCountryUrl, GenForeignKey):
+class CountryForeign(TranslatedMixin, GenCountryUrl, GenForeignKey):
     model = Country
     label = "{<LANGUAGE_CODE>__name}"
 
@@ -219,7 +219,7 @@ class CountryForeign(GenCountryUrl, GenForeignKey):
 
         for lang in settings.LANGUAGES_DATABASES:
             qsobject |= Q(**{"{}__name__icontains".format(lang.lower()): search})
-        qs = queryset.filter(qsobject)
+        qs = queryset.filter(qsobject).order_by("{}__name".format(self.lang))
         return qs[:settings.LIMIT_FOREIGNKEY]
 
 
@@ -324,7 +324,7 @@ class RegionDelete(GenRegionUrl, GenDelete):
     model = Region
 
 
-class RegionForeign(GenRegionUrl, GenForeignKey):
+class RegionForeign(TranslatedMixin, GenRegionUrl, GenForeignKey):
     model = Region
     label = "{<LANGUAGE_CODE>__name}"
 
@@ -339,6 +339,7 @@ class RegionForeign(GenRegionUrl, GenForeignKey):
         country = filters.get('country', None)
         if country:
             qs = qs.filter(country__pk=country)
+        qs = qs.order_by("{}__name".format(self.lang))
         return qs[:settings.LIMIT_FOREIGNKEY]
 
 
@@ -458,7 +459,7 @@ class ProvinceDelete(GenProvinceUrl, GenDelete):
     model = Province
 
 
-class ProvinceForeign(GenProvinceUrl, GenForeignKey):
+class ProvinceForeign(TranslatedMixin, GenProvinceUrl, GenForeignKey):
     model = Province
     label = "{<LANGUAGE_CODE>__name}"
 
@@ -473,6 +474,7 @@ class ProvinceForeign(GenProvinceUrl, GenForeignKey):
         region = filters.get('region', None)
         if region:
             qs = qs.filter(region__pk=region)
+        qs = qs.order_by("{}__name".format(self.lang))
         return qs[:settings.LIMIT_FOREIGNKEY]
 
 
@@ -638,7 +640,7 @@ class CityDelete(GenCityUrl, GenDelete):
     model = City
 
 
-class CityForeign(GenCityUrl, GenForeignKey):
+class CityForeign(TranslatedMixin, GenCityUrl, GenForeignKey):
     model = City
     label = "{<LANGUAGE_CODE>__name}"
 
@@ -663,4 +665,5 @@ class CityForeign(GenCityUrl, GenForeignKey):
         region = filters.get('region', None)
         if region:
             qs = qs.filter(region__pk=region)
+        qs = qs.order_by("{}__name".format(self.lang))
         return qs[:settings.LIMIT_FOREIGNKEY]
