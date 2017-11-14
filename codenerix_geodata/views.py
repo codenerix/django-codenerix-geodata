@@ -215,10 +215,10 @@ class CountryForeign(TranslatedMixin, GenCountryUrl, GenForeignKey):
 
     def get_foreign(self, queryset, search, filters):
         # Filter with search string
-        qsobject = Q(code__icontains=search)
+        qsobject = Q(code__istartswith=search)
 
         for lang in settings.LANGUAGES_DATABASES:
-            qsobject |= Q(**{"{}__name__icontains".format(lang.lower()): search})
+            qsobject |= Q(**{"{}__name__istartswith".format(lang.lower()): search})
         qs = queryset.filter(qsobject).order_by("{}__name".format(self.lang))
         return qs[:settings.LIMIT_FOREIGNKEY]
 
@@ -330,10 +330,10 @@ class RegionForeign(TranslatedMixin, GenRegionUrl, GenForeignKey):
 
     def get_foreign(self, queryset, search, filters):
         # Filter with search string
-        qsobject = Q(code__icontains=search)
+        qsobject = Q(code__istartswith=search)
 
         for lang in settings.LANGUAGES_DATABASES:
-            qsobject |= Q(**{"{}__name__icontains".format(lang.lower()): search})
+            qsobject |= Q(**{"{}__name__istartswith".format(lang.lower()): search})
         qs = queryset.filter(qsobject)
 
         country = filters.get('country', None)
@@ -465,10 +465,10 @@ class ProvinceForeign(TranslatedMixin, GenProvinceUrl, GenForeignKey):
 
     def get_foreign(self, queryset, search, filters):
         # Filter with search string
-        qsobject = Q(code__icontains=search)
+        qsobject = Q(code__istartswith=search)
 
         for lang in settings.LANGUAGES_DATABASES:
-            qsobject |= Q(**{"{}__name__icontains".format(lang.lower()): search})
+            qsobject |= Q(**{"{}__name__istartswith".format(lang.lower()): search})
         qs = queryset.filter(qsobject)
 
         region = filters.get('region', None)
@@ -648,7 +648,7 @@ class CityForeign(TranslatedMixin, GenCityUrl, GenForeignKey):
         # Filter with search string
         qsobject = []
         for lang in settings.LANGUAGES_DATABASES:
-            qsobject.append(Q(**{"{}__name__icontains".format(lang.lower()): search}))
+            qsobject.append(Q(**{"{}__name__istartswith".format(lang.lower()): search}))
         qs = queryset.filter(
             reduce(operator.or_, qsobject)
         )
