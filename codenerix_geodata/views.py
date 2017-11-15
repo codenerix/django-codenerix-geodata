@@ -141,9 +141,12 @@ class CountryList(TranslatedMixin, GenCountryUrl, GenList):
         try:
             params = ast.literal_eval(info.request.GET.get('json'))
         except ValueError:
-            params = []
-        if 'continent' in params:
-            result['continent_limit'] = Q(continent__pk=int(params['continent']))
+            params = {}
+
+        continent = int(params.get('continent', 0))
+
+        if continent:
+            result['continent_limit'] = Q(continent__pk=continent)
         return result
 
     def __fields__(self, info):
@@ -240,11 +243,15 @@ class RegionList(TranslatedMixin, GenRegionUrl, GenList):
         try:
             params = ast.literal_eval(info.request.GET.get('json'))
         except ValueError:
-            params = []
-        if 'continent' in params:
-            result['continent_limit'] = Q(country__continent__pk=int(params['continent']))
-        if 'country' in params:
-            result['country_limit'] = Q(country__pk=int(params['country']))
+            params = {}
+
+        continent = int(params.get('continent', 0))
+        country = int(params.get('country', 0))
+
+        if continent:
+            result['continent_limit'] = Q(country__continent__pk=continent)
+        if country:
+            result['country_limit'] = Q(country__pk=country)
         return result
 
     def __fields__(self, info):
@@ -360,13 +367,18 @@ class ProvinceList(TranslatedMixin, GenProvinceUrl, GenList):
         try:
             params = ast.literal_eval(info.request.GET.get('json'))
         except ValueError:
-            params = []
-        if 'continent' in params:
-            result['continent_limit'] = Q(region__country__continent__pk=int(params['continent']))
-        if 'country' in params:
-            result['country_limit'] = Q(region__country__pk=int(params['country']))
-        if 'region' in params:
-            result['region_limit'] = Q(region__pk=int(params['region']))
+            params = {}
+
+        continent = int(params.get('continent', 0))
+        country = int(params.get('country', 0))
+        region = int(params.get('region', 0))
+        
+        if continent:
+            result['continent_limit'] = Q(region__country__continent__pk=continent)
+        if country:
+            result['country_limit'] = Q(region__country__pk=country)
+        if region:
+            result['region_limit'] = Q(region__pk=region)
         return result
 
     def __fields__(self, info):
@@ -534,17 +546,24 @@ class CityList(TranslatedMixin, GenCityUrl, GenList):
         try:
             params = ast.literal_eval(info.request.GET.get('json'))
         except ValueError:
-            params = []
-        if 'continent' in params:
-            result['continent_limit'] = Q(region__country__continent__pk=int(params['continent']))
-        if 'country' in params:
-            result['country_limit'] = Q(country__pk=int(params['country']))
-        if 'region' in params:
-            result['region_limit'] = Q(region__pk=int(params['region']))
-        if 'province' in params:
-            result['province_limit'] = Q(province__pk=int(params['province']))
-        if 'time_zone' in params:
-            result['time_zone_limit'] = Q(time_zone__pk=int(params['time_zone']))
+            params = {}
+
+        continent = int(params.get('continent', 0))
+        country = int(params.get('country', 0))
+        region = int(params.get('region', 0))
+        province = int(params.get('province', 0))
+        time_zone = int(params.get('time_zone', 0))
+
+        if continent:
+            result['continent_limit'] = Q(region__country__continent__pk=continent)
+        if country:
+            result['country_limit'] = Q(country__pk=country)
+        if region:
+            result['region_limit'] = Q(region__pk=region)
+        if province:
+            result['province_limit'] = Q(province__pk=province)
+        if time_zone:
+            result['time_zone_limit'] = Q(time_zone__pk=time_zone)
 
         # result['country'] = Q(**{"country__{}__name__icontains".format(self.lang): u'españa'})
         # result['country'] = Q(**{"country__es__name__icontains".format(self.lang): u'españa'})
