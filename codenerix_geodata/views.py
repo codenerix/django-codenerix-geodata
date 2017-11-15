@@ -215,6 +215,7 @@ class CountryDelete(GenCountryUrl, GenDelete):
 class CountryForeign(TranslatedMixin, GenCountryUrl, GenForeignKey):
     model = Country
     label = "{<LANGUAGE_CODE>__name}"
+    public = True
 
     def get_foreign(self, queryset, search, filters):
         # Filter with search string
@@ -334,6 +335,7 @@ class RegionDelete(GenRegionUrl, GenDelete):
 class RegionForeign(TranslatedMixin, GenRegionUrl, GenForeignKey):
     model = Region
     label = "{<LANGUAGE_CODE>__name}"
+    public = True
 
     def get_foreign(self, queryset, search, filters):
         # Filter with search string
@@ -372,7 +374,7 @@ class ProvinceList(TranslatedMixin, GenProvinceUrl, GenList):
         continent = int(params.get('continent', 0))
         country = int(params.get('country', 0))
         region = int(params.get('region', 0))
-        
+
         if continent:
             result['continent_limit'] = Q(region__country__continent__pk=continent)
         if country:
@@ -474,6 +476,7 @@ class ProvinceDelete(GenProvinceUrl, GenDelete):
 class ProvinceForeign(TranslatedMixin, GenProvinceUrl, GenForeignKey):
     model = Province
     label = "{<LANGUAGE_CODE>__name}"
+    public = True
 
     def get_foreign(self, queryset, search, filters):
         # Filter with search string
@@ -662,7 +665,8 @@ class CityDelete(GenCityUrl, GenDelete):
 class CityForeign(TranslatedMixin, GenCityUrl, GenForeignKey):
     model = City
     label = "{<LANGUAGE_CODE>__name}"
-
+    public = True
+    
     def get_foreign(self, queryset, search, filters):
         # Filter with search string
         qsobject = []
