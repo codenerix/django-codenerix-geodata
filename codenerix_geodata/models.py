@@ -80,7 +80,7 @@ class Continent(CodenerixModel):
 
 class Country(CodenerixModel):
     code = models.CharField(_('Code'), max_length=2, unique=True, blank=False)
-    continent = models.ForeignKey(Continent, verbose_name=_('Continent'), related_name='countries', null=False)
+    continent = models.ForeignKey(Continent, on_delete=models.CASCADE, verbose_name=_('Continent'), related_name='countries', null=False)
 
     def __str__(self):
         lang = get_language_database()
@@ -137,7 +137,7 @@ class TimeZone(CodenerixModel):
 
 
 class Region(CodenerixModel):
-    country = models.ForeignKey(Country, verbose_name=_('Country'), null=False, related_name='regions')
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, verbose_name=_('Country'), null=False, related_name='regions')
     code = models.CharField(_('Code'), max_length=3, blank=False)
 
     def __str__(self):
@@ -170,7 +170,7 @@ class Region(CodenerixModel):
 
 
 class Province(CodenerixModel):
-    region = models.ForeignKey(Region, verbose_name=_('Region'), null=False, related_name='provinces')
+    region = models.ForeignKey(Region, on_delete=models.CASCADE, verbose_name=_('Region'), null=False, related_name='provinces')
     code = models.CharField(_('Code'), max_length=3, blank=False)
 
     def __str__(self):
@@ -203,10 +203,10 @@ class Province(CodenerixModel):
 
 
 class City(CodenerixModel):
-    country = models.ForeignKey(Country, verbose_name=_('Country'), null=False, related_name='cities')
-    region = models.ForeignKey(Region, verbose_name=_('Region'), null=True, related_name='cities')
-    province = models.ForeignKey(Province, verbose_name=_('Province'), null=True, related_name='cities')
-    time_zone = models.ForeignKey(TimeZone, verbose_name=_('City'), null=False, related_name='cities')
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, verbose_name=_('Country'), null=False, related_name='cities')
+    region = models.ForeignKey(Region, on_delete=models.CASCADE, verbose_name=_('Region'), null=True, related_name='cities')
+    province = models.ForeignKey(Province, on_delete=models.CASCADE, verbose_name=_('Province'), null=True, related_name='cities')
+    time_zone = models.ForeignKey(TimeZone, on_delete=models.CASCADE, verbose_name=_('City'), null=False, related_name='cities')
 
     def __str__(self):
         lang = get_language_database()
@@ -238,5 +238,5 @@ MODELS = (
 for field, model in MODELS:
     for lang_code in settings.LANGUAGES_DATABASES:
         query = "class {}GeoName{}(GenGeoName):\n".format(model, lang_code)
-        query += "    {} = models.OneToOneField({}, blank=False, null=False, related_name='{}')\n".format(field, model, lang_code.lower())
+        query += "    {} = models.OneToOneField({}, on_delete=models.CASCADE, blank=False, null=False, related_name='{}')\n".format(field, model, lang_code.lower())
         exec(query)
