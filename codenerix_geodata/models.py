@@ -24,7 +24,7 @@ from django.db.models import Q
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
 
-from codenerix.models import CodenerixModel
+from codenerix.models import CodenerixModel, GenInterface
 from codenerix_extensions.helpers import get_language_database
 
 
@@ -225,6 +225,61 @@ class City(CodenerixModel):
             ('country', _('Country'), 100),
             ('time_zone', _('Time zone'), 100),
         ]
+
+
+class GeoAddress(GenInterface):  # META: Abstract class
+    class Meta(GenInterface.Meta):
+        abstract = True
+        
+    alias = models.CharField(_("Alias"), max_length=100, blank=True, null=True)
+    country = models.ForeignKey(Country, related_name='%(app_label)s_%(class)s_geo_addresses', verbose_name=_("Country"), blank=True, null=True)
+    region = models.ForeignKey(Region, related_name='%(app_label)s_%(class)s_geo_addresses', verbose_name=_("Region"), blank=True, null=True)
+    province = models.ForeignKey(Province, related_name='%(app_label)s_%(class)s_geo_addresses', verbose_name=_("Province"), blank=True, null=True)
+    city = models.ForeignKey(City, related_name='%(app_label)s_%(class)s_geo_addresses', verbose_name=_("City"), null=True)
+    town = models.CharField(_("Town"), max_length=250, blank=True, null=True)
+    zipcode = models.CharField(_("Zip code"), max_length=6, blank=True, null=True)
+    address = models.CharField(_("Address"), max_length=250, blank=True, null=True)
+    phone = models.CharField(_("Phone"), max_length=16, blank=True, null=True)
+
+    def __str__(self):
+        lang = get_language_database()
+        lang_obj = getattr(self, '{}'.format(lang), None)
+        if lang_obj and lang_obj.name:
+            txt = lang_obj.name
+        else:
+            txt = self.code
+        return u"{}".format(smart_text(txt))
+
+    def __unicode__(self):
+        return self.__str__()
+
+    def __fields__(self, info):
+        return [
+            ('alias', _('Alias')),
+            ('country', _("Country")),
+            ('region', _("Region")),
+            ('province', _("Province")),
+            ('town', _("Town")),
+            ('city', _('City')),
+            ('zipcode', _('Zipcode')),
+            ('address', _('Address')),
+            ('phone', _('Phone')),
+        ]
+
+    def get_address(self):
+        return self.address or ''
+
+    def get_zipcode(self):
+        return self.zipcode or ''
+
+    def get_city(self):
+        return self.city or ''
+
+    def get_province(self):
+        return self.province or ''
+
+    def get_country(self):
+        return self.country or ''
 
 
 MODELS = (
