@@ -206,7 +206,7 @@ class City(CodenerixModel):
     country = models.ForeignKey(Country, on_delete=models.CASCADE, verbose_name=_('Country'), null=False, related_name='cities')
     region = models.ForeignKey(Region, on_delete=models.CASCADE, verbose_name=_('Region'), null=True, related_name='cities')
     province = models.ForeignKey(Province, on_delete=models.CASCADE, verbose_name=_('Province'), null=True, related_name='cities')
-    time_zone = models.ForeignKey(TimeZone, on_delete=models.CASCADE, verbose_name=_('City'), null=False, related_name='cities')
+    time_zone = models.ForeignKey(TimeZone, on_delete=models.CASCADE, verbose_name=_('Timezone'), null=False, related_name='cities')
 
     def __str__(self):
         lang = get_language_database()
@@ -230,7 +230,7 @@ class City(CodenerixModel):
 class GeoAddress(GenInterface):  # META: Abstract class
     class Meta(GenInterface.Meta):
         abstract = True
-        
+
     alias = models.CharField(_("Alias"), max_length=100, blank=True, null=True)
     country = models.ForeignKey(Country, related_name='%(app_label)s_%(class)s_geo_addresses', verbose_name=_("Country"), blank=True, null=True)
     region = models.ForeignKey(Region, related_name='%(app_label)s_%(class)s_geo_addresses', verbose_name=_("Region"), blank=True, null=True)
