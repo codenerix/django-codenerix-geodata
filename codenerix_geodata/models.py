@@ -231,7 +231,6 @@ class GeoAddress(GenInterface):  # META: Abstract class
     class Meta(GenInterface.Meta):
         abstract = True
         
-    alias = models.CharField(_("Alias"), max_length=100, blank=True, null=True)
     country = models.ForeignKey(Country, related_name='%(app_label)s_%(class)s_geo_addresses', verbose_name=_("Country"), blank=True, null=True)
     region = models.ForeignKey(Region, related_name='%(app_label)s_%(class)s_geo_addresses', verbose_name=_("Region"), blank=True, null=True)
     province = models.ForeignKey(Province, related_name='%(app_label)s_%(class)s_geo_addresses', verbose_name=_("Province"), blank=True, null=True)
@@ -255,7 +254,6 @@ class GeoAddress(GenInterface):  # META: Abstract class
 
     def __fields__(self, info):
         return [
-            ('alias', _('Alias')),
             ('country', _("Country")),
             ('region', _("Region")),
             ('province', _("Province")),
