@@ -231,10 +231,10 @@ class GeoAddress(GenInterface):  # META: Abstract class
     class Meta(GenInterface.Meta):
         abstract = True
 
-    country = models.ForeignKey(Country, related_name='%(app_label)s_%(class)s_geo_addresses', verbose_name=_("Country"), blank=True, null=True)
-    region = models.ForeignKey(Region, related_name='%(app_label)s_%(class)s_geo_addresses', verbose_name=_("Region"), blank=True, null=True)
-    province = models.ForeignKey(Province, related_name='%(app_label)s_%(class)s_geo_addresses', verbose_name=_("Province"), blank=True, null=True)
-    city = models.ForeignKey(City, related_name='%(app_label)s_%(class)s_geo_addresses', verbose_name=_("City"), null=True)
+    country = models.ForeignKey(Country, related_name='%(app_label)s_%(class)s_geo_addresses', verbose_name=_("Country"), blank=True, null=True, on_delete=models.CASCADE)
+    region = models.ForeignKey(Region, related_name='%(app_label)s_%(class)s_geo_addresses', verbose_name=_("Region"), blank=True, null=True, on_delete=models.CASCADE)
+    province = models.ForeignKey(Province, related_name='%(app_label)s_%(class)s_geo_addresses', verbose_name=_("Province"), blank=True, null=True, on_delete=models.CASCADE)
+    city = models.ForeignKey(City, related_name='%(app_label)s_%(class)s_geo_addresses', verbose_name=_("City"), null=True, on_delete=models.CASCADE)
     town = models.CharField(_("Town"), max_length=250, blank=True, null=True)
     zipcode = models.CharField(_("Zip code"), max_length=6, blank=True, null=True)
     address = models.CharField(_("Address"), max_length=250, blank=True, null=True)
