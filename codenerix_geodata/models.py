@@ -249,9 +249,6 @@ class GeoAddress(GenInterface):  # META: Abstract class
             txt = self.code
         return u"{}".format(smart_text(txt))
 
-    def __unicode__(self):
-        return self.__str__()
-
     def __fields__(self, info):
         return [
             ('country', _("Country")),
