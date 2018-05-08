@@ -18,7 +18,7 @@ setup(
     license='Apache License Version 2.0',
     description='Codenerix Geodata is a module that enables CODENERIX to manage geographical data on serveral platforms in a general manner.',
     long_description=README,
-    url='https://github.com/centrologic/django-codenerix-geodata',
+    url='https://github.com/codenerix/django-codenerix-geodata',
     author=", ".join(codenerix_geodata.__authors__),
     keywords=['django', 'codenerix', 'management', 'erp', 'crm', 'geodata', 'geo data'],
     platforms=['OS Independent'],
