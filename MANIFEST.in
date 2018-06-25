@@ -4,6 +4,7 @@ include README.rst
 exclude *.pyc
 exclude __pycache__
 exclude .ropeproject
+recursive-include codenerix_geodata/data *
 recursive-include codenerix_geodata/locale *
 recursive-include codenerix_geodata/management *
 recursive-include codenerix_geodata/migrations *
