@@ -44,6 +44,14 @@ urlpatterns = [
     url(r'^countrys/(?P<pk>\w+)/delete$', CountryDelete.as_view(), name='CDNX_geodata_countries_delete'),
     url(r'^countrys/foreign/(?P<search>[\w\W]+|\*)$', CountryForeign.as_view(), name='CDNX_ext_location_country_foreign'),
 
+    url(r'^countries$', CountryList.as_view(), name='CDNX_geodata_countries_list'),
+    url(r'^countries/add$', CountryCreate.as_view(), name='CDNX_geodata_countries_add'),
+    url(r'^countries/addmodal$', CountryCreateModal.as_view(), name='CDNX_geodata_countries_addmodal'),
+    url(r'^countries/(?P<pk>\w+)/edit$', CountryUpdate.as_view(), name='CDNX_geodata_countries_edit'),
+    url(r'^countries/(?P<pk>\w+)/editmodal$', CountryUpdateModal.as_view(), name='CDNX_geodata_countries_editmodal'),
+    url(r'^countries/(?P<pk>\w+)/delete$', CountryDelete.as_view(), name='CDNX_geodata_countries_delete'),
+    url(r'^countries/foreign/(?P<search>[\w\W]+|\*)$', CountryForeign.as_view(), name='CDNX_ext_location_country_foreign'),
+
     url(r'^regions$', RegionList.as_view(), name='CDNX_geodata_regions_list'),
     url(r'^regions/add$', RegionCreate.as_view(), name='CDNX_geodata_regions_add'),
     url(r'^regions/addmodal$', RegionCreateModal.as_view(), name='CDNX_geodata_regions_addmodal'),
@@ -74,4 +82,12 @@ urlpatterns = [
     url(r'^citys/(?P<pk>\w+)/editmodal$', CityUpdateModal.as_view(), name='CDNX_geodata_cities_editmodal'),
     url(r'^citys/(?P<pk>\w+)/delete$', CityDelete.as_view(), name='CDNX_geodata_cities_delete'),
     url(r'^citys/foreign/(?P<search>[\w\W]+|\*)$', CityForeign.as_view(), name='CDNX_ext_location_citys_foreign'),
+
+    url(r'^cities$', CityList.as_view(), name='CDNX_geodata_cities_list'),
+    url(r'^cities/add$', CityCreate.as_view(), name='CDNX_geodata_cities_add'),
+    url(r'^cities/addmodal$', CityCreateModal.as_view(), name='CDNX_geodata_cities_addmodal'),
+    url(r'^cities/(?P<pk>\w+)/edit$', CityUpdate.as_view(), name='CDNX_geodata_cities_edit'),
+    url(r'^cities/(?P<pk>\w+)/editmodal$', CityUpdateModal.as_view(), name='CDNX_geodata_cities_editmodal'),
+    url(r'^cities/(?P<pk>\w+)/delete$', CityDelete.as_view(), name='CDNX_geodata_cities_delete'),
+    url(r'^cities/foreign/(?P<search>[\w\W]+|\*)$', CityForeign.as_view(), name='CDNX_ext_location_citys_foreign'),
 ]

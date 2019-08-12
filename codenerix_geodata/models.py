@@ -214,7 +214,7 @@ class City(CodenerixModel):
         if lang_obj and lang_obj.name:
             txt = lang_obj.name
         else:
-            txt = self.code
+            txt = self.pk
         return u"{}".format(smart_text(txt))
 
     def __unicode__(self):
@@ -246,7 +246,7 @@ class GeoAddress(GenInterface):  # META: Abstract class
         if lang_obj and lang_obj.name:
             txt = lang_obj.name
         else:
-            txt = self.code
+            txt = self.pk
         return u"{}".format(smart_text(txt))
 
     def __fields__(self, info):
