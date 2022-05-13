@@ -21,8 +21,8 @@
 from django.conf import settings
 from django.db import models
 from django.db.models import Q
-from django.utils.encoding import smart_text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import smart_str
+from django.utils.translation import gettext_lazy as _
 
 from codenerix.models import CodenerixModel, GenInterface
 from codenerix_extensions.helpers import get_language_database
@@ -36,7 +36,7 @@ class GenGeoName(CodenerixModel):  # META: Abstract class
     name = models.CharField(_('Name'), max_length=100, blank=False)
 
     def __str__(self):
-        return u'{}'.format(smart_text(self.name))
+        return u'{}'.format(smart_str(self.name))
 
     def __unicode__(self):
         return self.__str__()
@@ -57,7 +57,7 @@ class Continent(CodenerixModel):
             txt = lang_obj.name
         else:
             txt = self.code
-        return u"{}".format(smart_text(txt))
+        return u"{}".format(smart_str(txt))
 
     def __unicode__(self):
         return self.__str__()
@@ -89,7 +89,7 @@ class Country(CodenerixModel):
             txt = lang_obj.name
         else:
             txt = self.code
-        return u"{}".format(smart_text(txt))
+        return u"{}".format(smart_str(txt))
 
     def __unicode__(self):
         return self.__str__()
@@ -115,7 +115,7 @@ class TimeZone(CodenerixModel):
     name = models.CharField(_('Name'), max_length=50, unique=True, blank=False)
 
     def __str__(self):
-        return u"{}".format(smart_text(self.name))
+        return u"{}".format(smart_str(self.name))
 
     def __unicode__(self):
         return self.__str__()
@@ -147,7 +147,7 @@ class Region(CodenerixModel):
             txt = lang_obj.name
         else:
             txt = self.code
-        return u"{}".format(smart_text(txt))
+        return u"{}".format(smart_str(txt))
 
     def __unicode__(self):
         return self.__str__()
@@ -180,7 +180,7 @@ class Province(CodenerixModel):
             txt = lang_obj.name
         else:
             txt = self.code
-        return u"{}".format(smart_text(txt))
+        return u"{}".format(smart_str(txt))
 
     def __unicode__(self):
         return self.__str__()
@@ -215,7 +215,7 @@ class City(CodenerixModel):
             txt = lang_obj.name
         else:
             txt = self.pk
-        return u"{}".format(smart_text(txt))
+        return u"{}".format(smart_str(txt))
 
     def __unicode__(self):
         return self.__str__()
@@ -247,7 +247,7 @@ class GeoAddress(GenInterface):  # META: Abstract class
             txt = lang_obj.name
         else:
             txt = self.pk
-        return u"{}".format(smart_text(txt))
+        return u"{}".format(smart_str(txt))
 
     def __fields__(self, info):
         return [
