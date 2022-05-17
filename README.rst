@@ -49,6 +49,6 @@ You can chat with us `here <https://goo.gl/NgpzBh>`_.
 Credits
 *******
 
-This project has been possible thanks to `Centrologic <http://www.centrologic.com/>`_.
+This project has been possible thanks to `Codenerix <http://www.codenerix.com>`_.
 
 The geographical data are offered by `Maxmind <https://www.maxmind.com/>`_, which is made available under Creative Commons Attribution 3.0
