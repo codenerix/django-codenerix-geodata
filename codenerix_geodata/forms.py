@@ -20,22 +20,32 @@
 
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from typing import List, Any
 
-from codenerix.forms import GenModelForm
+from codenerix.forms import GenModelForm  # type: ignore[import-untyped]
 
-from .models import Continent, Country, Region, Province, TimeZone, City, MODELS
+from .models import (
+    Continent,
+    Country,
+    Region,
+    Province,
+    TimeZone,
+    City,
+    MODELS,
+)
 
 
 class ContinentForm(GenModelForm):
     class Meta:
         model = Continent
-        exclude = []
+        exclude: List[Any] = []
 
     def __groups__(self):
         g = [
             (
-                _('Details'), 12,
-                ['code', 6],
+                _("Details"),
+                12,
+                ["code", 6],
             )
         ]
         return g
@@ -44,14 +54,15 @@ class ContinentForm(GenModelForm):
 class CountryForm(GenModelForm):
     class Meta:
         model = Country
-        exclude = []
+        exclude: List[Any] = []
 
     def __groups__(self):
         return [
             (
-                _('Details'), 12,
-                ['continent', 6],
-                ['code', 6],
+                _("Details"),
+                12,
+                ["continent", 6],
+                ["code", 6],
             )
         ]
 
@@ -59,14 +70,15 @@ class CountryForm(GenModelForm):
 class RegionForm(GenModelForm):
     class Meta:
         model = Region
-        exclude = []
+        exclude: List[Any] = []
 
     def __groups__(self):
         return [
             (
-                _('Details'), 12,
-                ['country', 6],
-                ['code', 6],
+                _("Details"),
+                12,
+                ["country", 6],
+                ["code", 6],
             )
         ]
 
@@ -74,14 +86,15 @@ class RegionForm(GenModelForm):
 class ProvinceForm(GenModelForm):
     class Meta:
         model = Province
-        exclude = []
+        exclude: List[Any] = []
 
     def __groups__(self):
         return [
             (
-                _('Details'), 12,
-                ['region', 6],
-                ['code', 6],
+                _("Details"),
+                12,
+                ["region", 6],
+                ["code", 6],
             )
         ]
 
@@ -89,13 +102,14 @@ class ProvinceForm(GenModelForm):
 class TimeZoneForm(GenModelForm):
     class Meta:
         model = TimeZone
-        exclude = []
+        exclude: List[Any] = []
 
     def __groups__(self):
         return [
             (
-                _('Details'), 12,
-                ['name', 6],
+                _("Details"),
+                12,
+                ["name", 6],
             )
         ]
 
@@ -103,23 +117,24 @@ class TimeZoneForm(GenModelForm):
 class CityForm(GenModelForm):
     class Meta:
         model = City
-        exclude = []
+        exclude: List[Any] = []
 
     def __groups__(self):
         return [
             (
-                _('Details'), 12,
-                ['country', 6],
-                ['region', 6],
-                ['province', 6],
-                ['time_zone', 6],
+                _("Details"),
+                12,
+                ["country", 6],
+                ["region", 6],
+                ["province", 6],
+                ["time_zone", 6],
             )
         ]
 
 
 # MODELS
 query = ""
-forms_dyn = []
+forms_dyn: List[Any] = []
 for info in MODELS:
     field = info[0]
     model = info[1]
@@ -130,16 +145,24 @@ for info in MODELS:
 class {model}TextForm{lang}(GenModelForm):\n
     class Meta:\n
         model={model}GeoName{lang}\n
-        exclude = []\n
+        exclude: List[Any] = []\n
     def __groups__(self):\n
         return [(_('Details'),12,"""
         if lang_code == settings.LANGUAGES_DATABASES[0]:
             query += """
                 ['name', 12, None, None, None, None, None, ["ng-blur=refresh_lang_field('name', '{model}TextForm', [{languages}])"]],
-            )]\n"""
+            )]\n"""  # noqa: E501
         else:
             query += """
                 ['name', 12],
             )]\n"""
 
-        exec(query.format(model=model, lang=lang_code, languages="'{}'".format("','".join(settings.LANGUAGES_DATABASES))))
+        exec(
+            query.format(
+                model=model,
+                lang=lang_code,
+                languages="'{}'".format(
+                    "','".join(settings.LANGUAGES_DATABASES)
+                ),
+            )
+        )
