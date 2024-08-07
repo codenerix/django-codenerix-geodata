@@ -28,10 +28,33 @@ from django.conf import settings
 from django.utils.translation import gettext as _
 
 from codenerix.multiforms import MultiForm
-from codenerix.views import GenList, GenCreate, GenCreateModal, GenUpdate, GenUpdateModal, GenDelete, GenForeignKey
+from codenerix.views import (
+    GenList,
+    GenCreate,
+    GenCreateModal,
+    GenUpdate,
+    GenUpdateModal,
+    GenDelete,
+    GenForeignKey,
+)
 
-from .models import Continent, Country, Region, Province, TimeZone, City, MODELS
-from .forms import ContinentForm, CountryForm, RegionForm, ProvinceForm, TimeZoneForm, CityForm
+from .models import (
+    Continent,
+    Country,
+    Region,
+    Province,
+    TimeZone,
+    City,
+    MODELS,
+)
+from .forms import (
+    ContinentForm,
+    CountryForm,
+    RegionForm,
+    ProvinceForm,
+    TimeZoneForm,
+    CityForm,
+)
 
 
 # forms for multiforms
@@ -42,18 +65,23 @@ for info in MODELS:
     model = info[1]
     formsfull[model] = [(None, None, None)]
     for lang_code in settings.LANGUAGES_DATABASES:
-        query = 'from .models import {}GeoName{}\n'.format(model, lang_code)
-        query += 'from .forms import {}TextForm{}'.format(model, lang_code)
+        query = "from .models import {}GeoName{}\n".format(model, lang_code)
+        query += "from .forms import {}TextForm{}".format(model, lang_code)
         exec(query)
 
-        formsfull[model].append((eval('{}TextForm{}'.format(model, lang_code.upper())), field, None))
+        formsfull[model].append(
+            (
+                eval("{}TextForm{}".format(model, lang_code.upper())),
+                field,
+                None,
+            )
+        )
 
 
 class TranslatedMixin(object):
-
     @property
     def lang(self):
-        if hasattr(self, 'request'):
+        if hasattr(self, "request"):
             for x in settings.LANGUAGES:
                 if x[0] == self.request.LANGUAGE_CODE:
                     return self.request.LANGUAGE_CODE.lower()
@@ -63,7 +91,7 @@ class TranslatedMixin(object):
 # ###########################################
 # Continent
 class GenContinentUrl(object):
-    ws_entry_point = '{}/continents'.format(settings.CDNX_GEODATA_URL)
+    ws_entry_point = "{}/continents".format(settings.CDNX_GEODATA_URL)
 
 
 class ContinentList(TranslatedMixin, GenContinentUrl, GenList):
@@ -75,35 +103,37 @@ class ContinentList(TranslatedMixin, GenContinentUrl, GenList):
     def __fields__(self, info):
         fields = self.model().__fields__(info)
         fields.append(
-            ('{}__name'.format(self.lang), _('Name')),
+            ("{}__name".format(self.lang), _("Name")),
         )
         return fields
 
     def __searchQ__(self, info, text):
         filters = self.model().__searchQ__(info, text)
-        filters['name'] = Q(**{"{}__name__icontains".format(self.lang): text})
+        filters["name"] = Q(**{"{}__name__icontains".format(self.lang): text})
         return filters
 
     def __searchF__(self, info):
         def f(x):
             qsobject = []
             for lang in settings.LANGUAGES_DATABASES:
-                qsobject.append(Q(**{"{}__name__icontains".format(lang.lower()): x}))
+                qsobject.append(
+                    Q(**{"{}__name__icontains".format(lang.lower()): x})
+                )
             return reduce(operator.or_, qsobject)
 
         filters = self.model().__searchF__(info)
-        filters['{}__name'.format(self.lang)] = (_('Name'), f, 'input')
+        filters["{}__name".format(self.lang)] = (_("Name"), f, "input")
         return filters
 
     def dispatch(self, request, *args, **kwargs):
-        self.order_by = ['{}__name'.format(self.lang)]
+        self.order_by = ["{}__name".format(self.lang)]
         return super(ContinentList, self).dispatch(request, *args, **kwargs)
 
 
 class ContinentCreate(GenContinentUrl, MultiForm, GenCreate):
     model = Continent
     form_class = ContinentForm
-    forms = formsfull['Continent']
+    forms = formsfull["Continent"]
 
 
 class ContinentCreateModal(GenCreateModal, ContinentCreate):
@@ -113,7 +143,7 @@ class ContinentCreateModal(GenCreateModal, ContinentCreate):
 class ContinentUpdate(GenContinentUrl, MultiForm, GenUpdate):
     model = Continent
     form_class = ContinentForm
-    forms = formsfull['Continent']
+    forms = formsfull["Continent"]
 
 
 class ContinentUpdateModal(GenUpdateModal, ContinentUpdate):
@@ -127,7 +157,7 @@ class ContinentDelete(GenContinentUrl, GenDelete):
 # ###########################################
 # Country
 class GenCountryUrl(object):
-    ws_entry_point = '{}/countries'.format(settings.CDNX_GEODATA_URL)
+    ws_entry_point = "{}/countries".format(settings.CDNX_GEODATA_URL)
 
 
 class CountryList(TranslatedMixin, GenCountryUrl, GenList):
@@ -139,59 +169,79 @@ class CountryList(TranslatedMixin, GenCountryUrl, GenList):
     def __limitQ__(self, info):
         result = {}
         try:
-            params = ast.literal_eval(info.request.GET.get('json'))
+            params = ast.literal_eval(info.request.GET.get("json"))
         except ValueError:
             params = {}
 
-        continent = int(params.get('continent', 0))
+        continent = int(params.get("continent", 0))
 
         if continent:
-            result['continent_limit'] = Q(continent__pk=continent)
+            result["continent_limit"] = Q(continent__pk=continent)
         return result
 
     def __fields__(self, info):
         return [
-            ('code', _('Code')),
-            ('{}__name'.format(self.lang), _('Name')),
-            ('continent__code', _('Code continent')),
-            ('continent__{}__name'.format(self.lang), _('Name continent')),
+            ("code", _("Code")),
+            ("{}__name".format(self.lang), _("Name")),
+            ("continent__code", _("Code continent")),
+            ("continent__{}__name".format(self.lang), _("Name continent")),
         ]
 
     def __searchQ__(self, info, text):
         filters = self.model().__searchQ__(info, text)
-        filters['name'] = Q(**{"{}__name__icontains".format(self.lang): text})
-        filters['continent_code'] = Q(**{"continent__code": text})
-        filters['continent_name'] = Q(**{"continent__{}__name__icontains".format(self.lang): text})
+        filters["name"] = Q(**{"{}__name__icontains".format(self.lang): text})
+        filters["continent_code"] = Q(**{"continent__code": text})
+        filters["continent_name"] = Q(
+            **{"continent__{}__name__icontains".format(self.lang): text}
+        )
         return filters
 
     def __searchF__(self, info):
         def f(x):
             qsobject = []
             for lang in settings.LANGUAGES_DATABASES:
-                qsobject.append(Q(**{"{}__name__icontains".format(lang.lower()): x}))
+                qsobject.append(
+                    Q(**{"{}__name__icontains".format(lang.lower()): x})
+                )
             return reduce(operator.or_, qsobject)
 
         def fc(x):
             qsobject = []
             for lang in settings.LANGUAGES_DATABASES:
-                qsobject.append(Q(**{"continent__{}__name__icontains".format(lang.lower()): x}))
+                qsobject.append(
+                    Q(
+                        **{
+                            "continent__{}__name__icontains".format(
+                                lang.lower()
+                            ): x
+                        }
+                    )
+                )
             return reduce(operator.or_, qsobject)
 
         filters = self.model().__searchF__(info)
-        filters['{}__name'.format(self.lang)] = (_('Name'), f, 'input')
-        filters['continent__code'] = (_('Code continent'), lambda x: Q(continent__code__icontains=x), 'input')
-        filters['continent__{}__name'.format(self.lang)] = (_('Continent name'), fc, 'input')
+        filters["{}__name".format(self.lang)] = (_("Name"), f, "input")
+        filters["continent__code"] = (
+            _("Code continent"),
+            lambda x: Q(continent__code__icontains=x),
+            "input",
+        )
+        filters["continent__{}__name".format(self.lang)] = (
+            _("Continent name"),
+            fc,
+            "input",
+        )
         return filters
 
     def dispatch(self, request, *args, **kwargs):
-        self.order_by = ['{}__name'.format(self.lang)]
+        self.order_by = ["{}__name".format(self.lang)]
         return super(CountryList, self).dispatch(request, *args, **kwargs)
 
 
 class CountryCreate(GenCountryUrl, MultiForm, GenCreate):
     model = Country
     form_class = CountryForm
-    forms = formsfull['Country']
+    forms = formsfull["Country"]
 
 
 class CountryCreateModal(GenCreateModal, CountryCreate):
@@ -201,7 +251,7 @@ class CountryCreateModal(GenCreateModal, CountryCreate):
 class CountryUpdate(GenCountryUrl, MultiForm, GenUpdate):
     model = Country
     form_class = CountryForm
-    forms = formsfull['Country']
+    forms = formsfull["Country"]
 
 
 class CountryUpdateModal(GenUpdateModal, CountryUpdate):
@@ -222,15 +272,17 @@ class CountryForeign(TranslatedMixin, GenCountryUrl, GenForeignKey):
         qsobject = Q(code__istartswith=search)
 
         for lang in settings.LANGUAGES_DATABASES:
-            qsobject |= Q(**{"{}__name__istartswith".format(lang.lower()): search})
+            qsobject |= Q(
+                **{"{}__name__istartswith".format(lang.lower()): search}
+            )
         qs = queryset.filter(qsobject).order_by("{}__name".format(self.lang))
-        return qs[:settings.LIMIT_FOREIGNKEY]
+        return qs
 
 
 # ###########################################
 # Regions
 class GenRegionUrl(object):
-    ws_entry_point = '{}/regions'.format(settings.CDNX_GEODATA_URL)
+    ws_entry_point = "{}/regions".format(settings.CDNX_GEODATA_URL)
 
 
 class RegionList(TranslatedMixin, GenRegionUrl, GenList):
@@ -242,76 +294,121 @@ class RegionList(TranslatedMixin, GenRegionUrl, GenList):
     def __limitQ__(self, info):
         result = {}
         try:
-            params = ast.literal_eval(info.request.GET.get('json'))
+            params = ast.literal_eval(info.request.GET.get("json"))
         except ValueError:
             params = {}
 
-        continent = int(params.get('continent', 0))
-        country = int(params.get('country', 0))
+        continent = int(params.get("continent", 0))
+        country = int(params.get("country", 0))
 
         if continent:
-            result['continent_limit'] = Q(country__continent__pk=continent)
+            result["continent_limit"] = Q(country__continent__pk=continent)
         if country:
-            result['country_limit'] = Q(country__pk=country)
+            result["country_limit"] = Q(country__pk=country)
         return result
 
     def __fields__(self, info):
         return [
-            ('code', _('Code')),
-            ('{}__name'.format(self.lang), _('Name')),
-            ('country__code', _('Code country')),
-            ('country__{}__name'.format(self.lang), _('Name country')),
-            ('country__continent__code', _('Code continent')),
-            ('country__continent__{}__name'.format(self.lang), _('Name continent')),
+            ("code", _("Code")),
+            ("{}__name".format(self.lang), _("Name")),
+            ("country__code", _("Code country")),
+            ("country__{}__name".format(self.lang), _("Name country")),
+            ("country__continent__code", _("Code continent")),
+            (
+                "country__continent__{}__name".format(self.lang),
+                _("Name continent"),
+            ),
         ]
 
     def __searchQ__(self, info, text):
         filters = self.model().__searchQ__(info, text)
-        filters['name'] = Q(**{"{}__name__icontains".format(self.lang): text})
-        filters['country_code'] = Q(**{'country__code': text})
-        filters['country_name'] = Q(**{'country__{}__name__icontains'.format(self.lang): text})
-        filters['continent_code'] = Q(**{"country__continent__code": text})
-        filters['continent_name'] = Q(**{"country__continent__{}__name__icontains".format(self.lang): text})
+        filters["name"] = Q(**{"{}__name__icontains".format(self.lang): text})
+        filters["country_code"] = Q(**{"country__code": text})
+        filters["country_name"] = Q(
+            **{"country__{}__name__icontains".format(self.lang): text}
+        )
+        filters["continent_code"] = Q(**{"country__continent__code": text})
+        filters["continent_name"] = Q(
+            **{
+                "country__continent__{}__name__icontains".format(
+                    self.lang
+                ): text
+            }
+        )
         return filters
 
     def __searchF__(self, info):
         def f(x):
             qsobject = []
             for lang in settings.LANGUAGES_DATABASES:
-                qsobject.append(Q(**{"{}__name__icontains".format(lang.lower()): x}))
+                qsobject.append(
+                    Q(**{"{}__name__icontains".format(lang.lower()): x})
+                )
             return reduce(operator.or_, qsobject)
 
         def fco(x):
             qsobject = []
             for lang in settings.LANGUAGES_DATABASES:
-                qsobject.append(Q(**{"country__continent__{}__name__icontains".format(lang.lower()): x}))
+                qsobject.append(
+                    Q(
+                        **{
+                            "country__continent__{}__name__icontains".format(
+                                lang.lower()
+                            ): x
+                        }
+                    )
+                )
             return reduce(operator.or_, qsobject)
 
         def fcu(x):
             qsobject = []
             for lang in settings.LANGUAGES_DATABASES:
-                qsobject.append(Q(**{"country__{}__name__icontains".format(lang.lower()): x}))
+                qsobject.append(
+                    Q(
+                        **{
+                            "country__{}__name__icontains".format(
+                                lang.lower()
+                            ): x
+                        }
+                    )
+                )
             return reduce(operator.or_, qsobject)
 
         filters = self.model().__searchF__(info)
-        filters['{}__name'.format(self.lang)] = (_('Name'), f, 'input')
+        filters["{}__name".format(self.lang)] = (_("Name"), f, "input")
 
-        filters['country__code'] = (_('Code self'), lambda x: Q(country__code__icontains=x), 'input')
-        filters['country__{}__name'.format(self.lang)] = (_('Name country'), fcu, 'input')
+        filters["country__code"] = (
+            _("Code self"),
+            lambda x: Q(country__code__icontains=x),
+            "input",
+        )
+        filters["country__{}__name".format(self.lang)] = (
+            _("Name country"),
+            fcu,
+            "input",
+        )
 
-        filters['country__continent__code'] = (_('Code continent'), lambda x: Q(country__continent__code__icontains=x), 'input')
-        filters['country__continent__{}__name'.format(self.lang)] = (_('Name continent'), fco, 'input')
+        filters["country__continent__code"] = (
+            _("Code continent"),
+            lambda x: Q(country__continent__code__icontains=x),
+            "input",
+        )
+        filters["country__continent__{}__name".format(self.lang)] = (
+            _("Name continent"),
+            fco,
+            "input",
+        )
         return filters
 
     def dispatch(self, request, *args, **kwargs):
-        self.order_by = ['{}__name'.format(self.lang)]
+        self.order_by = ["{}__name".format(self.lang)]
         return super(RegionList, self).dispatch(request, *args, **kwargs)
 
 
 class RegionCreate(GenRegionUrl, MultiForm, GenCreate):
     model = Region
     form_class = RegionForm
-    forms = formsfull['Region']
+    forms = formsfull["Region"]
 
 
 class RegionCreateModal(GenCreateModal, RegionCreate):
@@ -321,7 +418,7 @@ class RegionCreateModal(GenCreateModal, RegionCreate):
 class RegionUpdate(GenRegionUrl, MultiForm, GenUpdate):
     model = Region
     form_class = RegionForm
-    forms = formsfull['Region']
+    forms = formsfull["Region"]
 
 
 class RegionUpdateModal(GenUpdateModal, RegionUpdate):
@@ -342,20 +439,22 @@ class RegionForeign(TranslatedMixin, GenRegionUrl, GenForeignKey):
         qsobject = Q(code__istartswith=search)
 
         for lang in settings.LANGUAGES_DATABASES:
-            qsobject |= Q(**{"{}__name__istartswith".format(lang.lower()): search})
+            qsobject |= Q(
+                **{"{}__name__istartswith".format(lang.lower()): search}
+            )
         qs = queryset.filter(qsobject)
 
-        country = filters.get('country', None)
+        country = filters.get("country", None)
         if country:
             qs = qs.filter(country__pk=country)
         qs = qs.order_by("{}__name".format(self.lang))
-        return qs[:settings.LIMIT_FOREIGNKEY]
+        return qs
 
 
 # ###########################################
 # Provinces
 class GenProvinceUrl(object):
-    ws_entry_point = '{}/provinces'.format(settings.CDNX_GEODATA_URL)
+    ws_entry_point = "{}/provinces".format(settings.CDNX_GEODATA_URL)
 
 
 class ProvinceList(TranslatedMixin, GenProvinceUrl, GenList):
@@ -367,92 +466,159 @@ class ProvinceList(TranslatedMixin, GenProvinceUrl, GenList):
     def __limitQ__(self, info):
         result = {}
         try:
-            params = ast.literal_eval(info.request.GET.get('json'))
+            params = ast.literal_eval(info.request.GET.get("json"))
         except ValueError:
             params = {}
 
-        continent = int(params.get('continent', 0))
-        country = int(params.get('country', 0))
-        region = int(params.get('region', 0))
+        continent = int(params.get("continent", 0))
+        country = int(params.get("country", 0))
+        region = int(params.get("region", 0))
 
         if continent:
-            result['continent_limit'] = Q(region__country__continent__pk=continent)
+            result["continent_limit"] = Q(
+                region__country__continent__pk=continent
+            )
         if country:
-            result['country_limit'] = Q(region__country__pk=country)
+            result["country_limit"] = Q(region__country__pk=country)
         if region:
-            result['region_limit'] = Q(region__pk=region)
+            result["region_limit"] = Q(region__pk=region)
         return result
 
     def __fields__(self, info):
         return [
-            ('code', _('Code')),
-            ('{}__name'.format(self.lang), _('Name')),
-            ('region__code', _('Code region')),
-            ('region__{}__name'.format(self.lang), _('Name region')),
-            ('region__country__code', _('Code country')),
-            ('region__country__{}__name'.format(self.lang), _('Name country')),
-            ('region__country__continent__code', _('Code continent')),
-            ('region__country__continent__{}__name'.format(self.lang), _('Name continent')),
+            ("code", _("Code")),
+            ("{}__name".format(self.lang), _("Name")),
+            ("region__code", _("Code region")),
+            ("region__{}__name".format(self.lang), _("Name region")),
+            ("region__country__code", _("Code country")),
+            ("region__country__{}__name".format(self.lang), _("Name country")),
+            ("region__country__continent__code", _("Code continent")),
+            (
+                "region__country__continent__{}__name".format(self.lang),
+                _("Name continent"),
+            ),
         ]
 
     def __searchQ__(self, info, text):
         filters = self.model().__searchQ__(info, text)
-        filters['name'] = Q(**{"{}__name__icontains".format(self.lang): text})
-        filters['region_code'] = Q(**{'region__code': text})
-        filters['region_name'] = Q(**{'region__{}__name__icontains'.format(self.lang): text})
-        filters['country_code'] = Q(**{'region__country__code': text})
-        filters['country_name'] = Q(**{'region__country__{}__name__icontains'.format(self.lang): text})
-        filters['continent_code'] = Q(**{"region__country__continent__code": text})
-        filters['continent_name'] = Q(**{"region__country__continent__{}__name__icontains".format(self.lang): text})
+        filters["name"] = Q(**{"{}__name__icontains".format(self.lang): text})
+        filters["region_code"] = Q(**{"region__code": text})
+        filters["region_name"] = Q(
+            **{"region__{}__name__icontains".format(self.lang): text}
+        )
+        filters["country_code"] = Q(**{"region__country__code": text})
+        filters["country_name"] = Q(
+            **{"region__country__{}__name__icontains".format(self.lang): text}
+        )
+        filters["continent_code"] = Q(
+            **{"region__country__continent__code": text}
+        )
+        filters["continent_name"] = Q(
+            **{
+                "region__country__continent__{}__name__icontains".format(
+                    self.lang
+                ): text
+            }
+        )
         return filters
 
     def __searchF__(self, info):
         def f(x):
             qsobject = []
             for lang in settings.LANGUAGES_DATABASES:
-                qsobject.append(Q(**{"{}__name__icontains".format(lang.lower()): x}))
+                qsobject.append(
+                    Q(**{"{}__name__icontains".format(lang.lower()): x})
+                )
             return reduce(operator.or_, qsobject)
 
         def fr(x):
             qsobject = []
             for lang in settings.LANGUAGES_DATABASES:
-                qsobject.append(Q(**{"region__{}__name__icontains".format(lang.lower()): x}))
+                qsobject.append(
+                    Q(
+                        **{
+                            "region__{}__name__icontains".format(
+                                lang.lower()
+                            ): x
+                        }
+                    )
+                )
             return reduce(operator.or_, qsobject)
 
         def fco(x):
             qsobject = []
             for lang in settings.LANGUAGES_DATABASES:
-                qsobject.append(Q(**{"region__country__continent__{}__name__icontains".format(lang.lower()): x}))
+                qsobject.append(
+                    Q(
+                        **{
+                            "region__country__continent__{}__name__icontains".format(
+                                lang.lower()
+                            ): x
+                        }
+                    )
+                )
             return reduce(operator.or_, qsobject)
 
         def fcu(x):
             qsobject = []
             for lang in settings.LANGUAGES_DATABASES:
-                qsobject.append(Q(**{"region__country__{}__name__icontains".format(lang.lower()): x}))
+                qsobject.append(
+                    Q(
+                        **{
+                            "region__country__{}__name__icontains".format(
+                                lang.lower()
+                            ): x
+                        }
+                    )
+                )
             return reduce(operator.or_, qsobject)
 
         filters = self.model().__searchF__(info)
-        filters['{}__name'.format(self.lang)] = (_('Name'), f, 'input')
+        filters["{}__name".format(self.lang)] = (_("Name"), f, "input")
 
-        filters['region__code'] = (_('Code self'), lambda x: Q(region__code__icontains=x), 'input')
-        filters['region__{}__name'.format(self.lang)] = (_('Name region'), fr, 'input')
+        filters["region__code"] = (
+            _("Code self"),
+            lambda x: Q(region__code__icontains=x),
+            "input",
+        )
+        filters["region__{}__name".format(self.lang)] = (
+            _("Name region"),
+            fr,
+            "input",
+        )
 
-        filters['region__country__code'] = (_('Code self'), lambda x: Q(region__country__code__icontains=x), 'input')
-        filters['region__country__{}__name'.format(self.lang)] = (_('Name country'), fcu, 'input')
+        filters["region__country__code"] = (
+            _("Code self"),
+            lambda x: Q(region__country__code__icontains=x),
+            "input",
+        )
+        filters["region__country__{}__name".format(self.lang)] = (
+            _("Name country"),
+            fcu,
+            "input",
+        )
 
-        filters['region__country__continent__code'] = (_('Code continent'), lambda x: Q(region__country__continent__code__icontains=x), 'input')
-        filters['region__country__continent__{}__name'.format(self.lang)] = (_('Name continent'), fco, 'input')
+        filters["region__country__continent__code"] = (
+            _("Code continent"),
+            lambda x: Q(region__country__continent__code__icontains=x),
+            "input",
+        )
+        filters["region__country__continent__{}__name".format(self.lang)] = (
+            _("Name continent"),
+            fco,
+            "input",
+        )
         return filters
 
     def dispatch(self, request, *args, **kwargs):
-        self.order_by = ['{}__name'.format(self.lang)]
+        self.order_by = ["{}__name".format(self.lang)]
         return super(ProvinceList, self).dispatch(request, *args, **kwargs)
 
 
 class ProvinceCreate(GenProvinceUrl, MultiForm, GenCreate):
     model = Province
     form_class = ProvinceForm
-    forms = formsfull['Province']
+    forms = formsfull["Province"]
 
 
 class ProvinceCreateModal(GenCreateModal, ProvinceCreate):
@@ -462,7 +628,7 @@ class ProvinceCreateModal(GenCreateModal, ProvinceCreate):
 class ProvinceUpdate(GenProvinceUrl, MultiForm, GenUpdate):
     model = Province
     form_class = ProvinceForm
-    forms = formsfull['Province']
+    forms = formsfull["Province"]
 
 
 class ProvinceUpdateModal(GenUpdateModal, ProvinceUpdate):
@@ -483,20 +649,22 @@ class ProvinceForeign(TranslatedMixin, GenProvinceUrl, GenForeignKey):
         qsobject = Q(code__istartswith=search)
 
         for lang in settings.LANGUAGES_DATABASES:
-            qsobject |= Q(**{"{}__name__istartswith".format(lang.lower()): search})
+            qsobject |= Q(
+                **{"{}__name__istartswith".format(lang.lower()): search}
+            )
         qs = queryset.filter(qsobject)
 
-        region = filters.get('region', None)
+        region = filters.get("region", None)
         if region:
             qs = qs.filter(region__pk=region)
         qs = qs.order_by("{}__name".format(self.lang))
-        return qs[:settings.LIMIT_FOREIGNKEY]
+        return qs
 
 
 # ###########################################
 # TimeZone
 class GenTimeZoneUrl(object):
-    ws_entry_point = '{}/timezones'.format(settings.CDNX_GEODATA_URL)
+    ws_entry_point = "{}/timezones".format(settings.CDNX_GEODATA_URL)
 
 
 class TimeZoneList(GenTimeZoneUrl, GenList):
@@ -506,7 +674,7 @@ class TimeZoneList(GenTimeZoneUrl, GenList):
     public = True
 
     def dispatch(self, request, *args, **kwargs):
-        self.order_by = ['name']
+        self.order_by = ["name"]
         return super(TimeZoneList, self).dispatch(request, *args, **kwargs)
 
 
@@ -535,7 +703,7 @@ class TimeZoneDelete(GenTimeZoneUrl, GenDelete):
 # ###########################################
 # City
 class GenCityUrl(object):
-    ws_entry_point = '{}/cities'.format(settings.CDNX_GEODATA_URL)
+    ws_entry_point = "{}/cities".format(settings.CDNX_GEODATA_URL)
 
 
 class CityList(TranslatedMixin, GenCityUrl, GenList):
@@ -547,26 +715,28 @@ class CityList(TranslatedMixin, GenCityUrl, GenList):
     def __limitQ__(self, info):
         result = {}
         try:
-            params = ast.literal_eval(info.request.GET.get('json'))
+            params = ast.literal_eval(info.request.GET.get("json"))
         except ValueError:
             params = {}
 
-        continent = int(params.get('continent', 0))
-        country = int(params.get('country', 0))
-        region = int(params.get('region', 0))
-        province = int(params.get('province', 0))
-        time_zone = int(params.get('time_zone', 0))
+        continent = int(params.get("continent", 0))
+        country = int(params.get("country", 0))
+        region = int(params.get("region", 0))
+        province = int(params.get("province", 0))
+        time_zone = int(params.get("time_zone", 0))
 
         if continent:
-            result['continent_limit'] = Q(region__country__continent__pk=continent)
+            result["continent_limit"] = Q(
+                region__country__continent__pk=continent
+            )
         if country:
-            result['country_limit'] = Q(country__pk=country)
+            result["country_limit"] = Q(country__pk=country)
         if region:
-            result['region_limit'] = Q(region__pk=region)
+            result["region_limit"] = Q(region__pk=region)
         if province:
-            result['province_limit'] = Q(province__pk=province)
+            result["province_limit"] = Q(province__pk=province)
         if time_zone:
-            result['time_zone_limit'] = Q(time_zone__pk=time_zone)
+            result["time_zone_limit"] = Q(time_zone__pk=time_zone)
 
         # result['country'] = Q(**{"country__{}__name__icontains".format(self.lang): u'españa'})
         # result['country'] = Q(**{"country__es__name__icontains".format(self.lang): u'españa'})
@@ -574,74 +744,137 @@ class CityList(TranslatedMixin, GenCityUrl, GenList):
 
     def __fields__(self, info):
         return [
-            ('{}__name'.format(self.lang), _('Name')),
-            ('time_zone', _('Time Zone')),
-            ('province__code'.format(self.lang), _('Code province')),
-            ('province__{}__name'.format(self.lang), _('Province')),
-            ('country__code'.format(self.lang), _('Code country')),
-            ('country__{}__name'.format(self.lang), _('Country')),
-            ('country__continent__code', _('Code continent')),
-            ('country__continent__{}__name'.format(self.lang), _('Name continent')),
+            ("{}__name".format(self.lang), _("Name")),
+            ("time_zone", _("Time Zone")),
+            ("province__code".format(self.lang), _("Code province")),
+            ("province__{}__name".format(self.lang), _("Province")),
+            ("country__code".format(self.lang), _("Code country")),
+            ("country__{}__name".format(self.lang), _("Country")),
+            ("country__continent__code", _("Code continent")),
+            (
+                "country__continent__{}__name".format(self.lang),
+                _("Name continent"),
+            ),
         ]
 
     def __searchQ__(self, info, text):
         filters = self.model().__searchQ__(info, text)
-        filters['name'] = Q(**{"{}__name__icontains".format(self.lang): text})
-        filters['province_code'] = Q(**{'province__code': text})
-        filters['province_name'] = Q(**{'province__{}__name__icontains'.format(self.lang): text})
-        filters['country_code'] = Q(**{'country__code': text})
-        filters['country_name'] = Q(**{'country__{}__name__icontains'.format(self.lang): text})
-        filters['continent_code'] = Q(**{"country__continent__code": text})
-        filters['continent_name'] = Q(**{"country__continent__{}__name__icontains".format(self.lang): text})
+        filters["name"] = Q(**{"{}__name__icontains".format(self.lang): text})
+        filters["province_code"] = Q(**{"province__code": text})
+        filters["province_name"] = Q(
+            **{"province__{}__name__icontains".format(self.lang): text}
+        )
+        filters["country_code"] = Q(**{"country__code": text})
+        filters["country_name"] = Q(
+            **{"country__{}__name__icontains".format(self.lang): text}
+        )
+        filters["continent_code"] = Q(**{"country__continent__code": text})
+        filters["continent_name"] = Q(
+            **{
+                "country__continent__{}__name__icontains".format(
+                    self.lang
+                ): text
+            }
+        )
         return filters
 
     def __searchF__(self, info):
         def f(x):
             qsobject = []
             for lang in settings.LANGUAGES_DATABASES:
-                qsobject.append(Q(**{"{}__name__icontains".format(lang.lower()): x}))
+                qsobject.append(
+                    Q(**{"{}__name__icontains".format(lang.lower()): x})
+                )
             return reduce(operator.or_, qsobject)
 
         def fp(x):
             qsobject = []
             for lang in settings.LANGUAGES_DATABASES:
-                qsobject.append(Q(**{"province__{}__name__icontains".format(lang.lower()): x}))
+                qsobject.append(
+                    Q(
+                        **{
+                            "province__{}__name__icontains".format(
+                                lang.lower()
+                            ): x
+                        }
+                    )
+                )
             return reduce(operator.or_, qsobject)
 
         def fco(x):
             qsobject = []
             for lang in settings.LANGUAGES_DATABASES:
-                qsobject.append(Q(**{"country__continent__{}__name__icontains".format(lang.lower()): x}))
+                qsobject.append(
+                    Q(
+                        **{
+                            "country__continent__{}__name__icontains".format(
+                                lang.lower()
+                            ): x
+                        }
+                    )
+                )
             return reduce(operator.or_, qsobject)
 
         def fcu(x):
             qsobject = []
             for lang in settings.LANGUAGES_DATABASES:
-                qsobject.append(Q(**{"country__{}__name__icontains".format(lang.lower()): x}))
+                qsobject.append(
+                    Q(
+                        **{
+                            "country__{}__name__icontains".format(
+                                lang.lower()
+                            ): x
+                        }
+                    )
+                )
             return reduce(operator.or_, qsobject)
 
         filters = self.model().__searchF__(info)
-        filters['{}__name'.format(self.lang)] = (_('Name'), f, 'input')
+        filters["{}__name".format(self.lang)] = (_("Name"), f, "input")
 
-        filters['province__code'] = (_('Code self'), lambda x: Q(province__code__icontains=x), 'input')
-        filters['province__{}__name'.format(self.lang)] = (_('Name region'), fp, 'input')
+        filters["province__code"] = (
+            _("Code self"),
+            lambda x: Q(province__code__icontains=x),
+            "input",
+        )
+        filters["province__{}__name".format(self.lang)] = (
+            _("Name region"),
+            fp,
+            "input",
+        )
 
-        filters['country__code'] = (_('Code self'), lambda x: Q(country__code__icontains=x), 'input')
-        filters['country__{}__name'.format(self.lang)] = (_('Name country'), fcu, 'input')
+        filters["country__code"] = (
+            _("Code self"),
+            lambda x: Q(country__code__icontains=x),
+            "input",
+        )
+        filters["country__{}__name".format(self.lang)] = (
+            _("Name country"),
+            fcu,
+            "input",
+        )
 
-        filters['country__continent__code'] = (_('Code continent'), lambda x: Q(country__continent__code__icontains=x), 'input')
-        filters['country__continent__{}__name'.format(self.lang)] = (_('Name continent'), fco, 'input')
+        filters["country__continent__code"] = (
+            _("Code continent"),
+            lambda x: Q(country__continent__code__icontains=x),
+            "input",
+        )
+        filters["country__continent__{}__name".format(self.lang)] = (
+            _("Name continent"),
+            fco,
+            "input",
+        )
         return filters
 
     def dispatch(self, request, *args, **kwargs):
-        self.order_by = ['{}__name'.format(self.lang)]
+        self.order_by = ["{}__name".format(self.lang)]
         return super(CityList, self).dispatch(request, *args, **kwargs)
 
 
 class CityCreate(GenCityUrl, MultiForm, GenCreate):
     model = City
     form_class = CityForm
-    forms = formsfull['City']
+    forms = formsfull["City"]
 
 
 class CityCreateModal(GenCreateModal, CityCreate):
@@ -651,7 +884,7 @@ class CityCreateModal(GenCreateModal, CityCreate):
 class CityUpdate(GenCityUrl, MultiForm, GenUpdate):
     model = City
     form_class = CityForm
-    forms = formsfull['City']
+    forms = formsfull["City"]
 
 
 class CityUpdateModal(GenUpdateModal, CityUpdate):
@@ -666,27 +899,27 @@ class CityForeign(TranslatedMixin, GenCityUrl, GenForeignKey):
     model = City
     label = "{<LANGUAGE_CODE>__name}"
     public = True
-    
+
     def get_foreign(self, queryset, search, filters):
         # Filter with search string
         qsobject = []
         for lang in settings.LANGUAGES_DATABASES:
-            qsobject.append(Q(**{"{}__name__istartswith".format(lang.lower()): search}))
-        qs = queryset.filter(
-            reduce(operator.or_, qsobject)
-        )
+            qsobject.append(
+                Q(**{"{}__name__istartswith".format(lang.lower()): search})
+            )
+        qs = queryset.filter(reduce(operator.or_, qsobject))
         # qs = queryset.filter(qsobject)
 
-        country = filters.get('country', None)
+        country = filters.get("country", None)
         if country:
             qs = qs.filter(country__pk=country)
 
-        province = filters.get('province', None)
+        province = filters.get("province", None)
         if province:
             qs = qs.filter(province__pk=province)
 
-        region = filters.get('region', None)
+        region = filters.get("region", None)
         if region:
             qs = qs.filter(region__pk=region)
         qs = qs.order_by("{}__name".format(self.lang))
-        return qs[:settings.LIMIT_FOREIGNKEY]
+        return qs

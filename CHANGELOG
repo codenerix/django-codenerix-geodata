@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.4] - 2024-08-07
+### Fixed
+- Removed limits on GenForeignKey
+
 ## [4.0.3] - 2024-05-23
 ### Fixed
 - Populate works now with Django v5.x
