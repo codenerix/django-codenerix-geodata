@@ -49,7 +49,7 @@ setup(
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
     ],
     install_requires=[
-        "django_codenerix",
+        "django_codenerix>=5.0.69",
         "django_codenerix_extensions",
     ],
 )
