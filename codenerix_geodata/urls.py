@@ -50,7 +50,7 @@ urlpatterns = [
     re_path(r'^countries/(?P<pk>\w+)/edit$', CountryUpdate.as_view(), name='CDNX_geodata_countries_edit'),
     re_path(r'^countries/(?P<pk>\w+)/editmodal$', CountryUpdateModal.as_view(), name='CDNX_geodata_countries_editmodal'),
     re_path(r'^countries/(?P<pk>\w+)/delete$', CountryDelete.as_view(), name='CDNX_geodata_countries_delete'),
-    re_path(r'^countries/foreign/(?P<search>[\w\W]+|\*)$', CountryForeign.as_view(), name='CDNX_ext_location_country_foreign'),
+    re_path(r'^countries/foreign/(?P<search>[\w\W]+|\*)$', CountryForeign.as_view(), name='CDNX_ext_location_countryies_foreign'),
 
     re_path(r'^regions$', RegionList.as_view(), name='CDNX_geodata_regions_list'),
     re_path(r'^regions/add$', RegionCreate.as_view(), name='CDNX_geodata_regions_add'),

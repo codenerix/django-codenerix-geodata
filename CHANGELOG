@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Stable]
 
+## [4.0.7] - 2026-09-10
+### Bug
+- Duplicated name in urls resolved
+
 ## [4.0.6] - 2026-03-27
 ### Fixed
 - Missing migration
